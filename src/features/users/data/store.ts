@@ -146,7 +146,11 @@ export class UsersStore {
 
   @computed
   get selectedAll() {
-    return this.users && this.selectedItems.size === this.users.length
+    return (
+      this.users &&
+      this.users.length &&
+      this.selectedItems.size === this.users.length
+    )
   }
 
   // Confirm delete
