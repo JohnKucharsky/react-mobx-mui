@@ -14,9 +14,7 @@ const ConfirmDelete = observer(function ConfirmDelete({
       if (usersStore.idToDelete) {
         await usersStore.deleteUser(usersStore.idToDelete)
       } else {
-        for (const id of usersStore.selectedItems) {
-          await usersStore.deleteUser(id)
-        }
+        await usersStore.deleteManyUsers()
       }
     } catch (e) {
       console.error(e)

@@ -74,15 +74,35 @@ export class UsersStore {
         if (this.users) {
           this.users = this.users.filter((item) => item.id !== id)
         }
-        if (this.selectedItems.size === 0) {
-          this.clearSelectedItems()
-        }
       })
     } catch (e) {
       logZodError(e, apiRoutes['/users'])
     } finally {
       runInAction(() => {
+        this.clearSelectedItems()
         this.usersLoading = false
+      })
+    }
+  }
+
+  @action
+  async deleteManyUsers() {
+    this.usersLoading = true
+    try {
+      for (const id of this.selectedItems) {
+        await axiosInstance.delete(`${apiRoutes['/users']}/${id}`)
+        runInAction(() => {
+          if (this.users) {
+            this.users = this.users.filter((item) => item.id !== id)
+          }
+        })
+      }
+    } catch (e) {
+      logZodError(e, apiRoutes['/users'])
+    } finally {
+      runInAction(() => {
+        this.usersLoading = false
+        this.clearSelectedItems()
       })
     }
   }
