@@ -17,8 +17,8 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import TypographySkeleton from '@/components/TypographySkeleton.tsx'
 import Comment from '@/features/user-details/Comment.tsx'
-import { UserDetailsStore } from '@/features/user-details/data/api.ts'
 import { typographyPropsObj } from '@/features/user-details/data/service.tsx'
+import { UserDetailsStore } from '@/features/user-details/data/store.ts'
 import { addTestKey } from '@/utils/test-keys.ts'
 
 const Posts = observer(function Posts({

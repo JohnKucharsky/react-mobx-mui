@@ -1,5 +1,6 @@
-import { action, observable, runInAction } from 'mobx'
+import { action, flow, observable, runInAction } from 'mobx'
 import { z } from 'zod'
+import { GeneratorT } from '@/@types/mobx.ts'
 import {
   CommentType,
   CommentSchema,
@@ -20,18 +21,17 @@ export class UserDetailsStore {
   @observable accessor userLoading: boolean = false
 
   @observable accessor comments: Record<string, CommentType[]> | null = null
-  @observable accessor commentLoading: boolean = false
+  @observable accessor commentLoading: boolean = false;
 
-  @action
-  async fetchComments() {
+  // @ts-expect-error
+  @flow
+  *fetchComments(): GeneratorT<CommentType[]> {
+    this.commentLoading = true
     try {
-      this.commentLoading = true
-      const res = await axiosInstance.get<CommentType[]>(apiRoutes['/comments'])
+      const res = yield axiosInstance.get<CommentType[]>(apiRoutes['/comments'])
       z.array(CommentSchema).parse(res.data)
 
-      runInAction(() => {
-        this.comments = groupBy(res.data, (comment) => comment.postId)
-      })
+      this.comments = groupBy(res.data, (comment) => comment.postId)
     } catch (e) {
       logZodError(e, apiRoutes['/comments'])
     } finally {
