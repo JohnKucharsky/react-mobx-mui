@@ -27,9 +27,9 @@ export class UsersStore {
       const res = await axiosInstance.get<User[]>(apiRoutes['/users'], {
         params: { id: id || undefined },
       })
+      z.array(UserSchema).parse(res.data)
 
       runInAction(() => {
-        z.array(UserSchema).parse(res.data)
         this.users = res.data
       })
     } catch (e) {

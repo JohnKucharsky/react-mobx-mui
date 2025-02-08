@@ -70,7 +70,9 @@ export class UserDetailsStore {
     } catch (e) {
       logZodError(e, apiRoutes['/users'])
     } finally {
-      this.userLoading = false
+      runInAction(() => {
+        this.userLoading = false
+      })
     }
   }
 }
