@@ -1,0 +1,42 @@
+[
+  {
+    "data-id": "name-field",
+    "value": "John"
+  },
+  {
+    "data-id": "username-field",
+    "value": "johnkucharsky"
+  },
+  {
+    "data-id": "email-field",
+    "value": "vannok@live.com"
+  },
+  {
+    "data-id": "phone-field",
+    "value": "9251805132"
+  },
+  {
+    "data-id": "website-field",
+    "value": "https://react-effector-mui.vercel.app"
+  },
+  {
+    "data-id": "street-field",
+    "value": "Dorata"
+  },
+  {
+    "data-id": "suite-field",
+    "value": "Center"
+  },
+  {
+    "data-id": "city-field",
+    "value": "Krasnodar"
+  },
+  {
+    "data-id": "zipcode-field",
+    "value": "230895"
+  },
+  {
+    "data-id": "company-name-field",
+    "value": "Kucharsky Company"
+  }
+]
