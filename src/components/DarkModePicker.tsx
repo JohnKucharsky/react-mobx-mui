@@ -3,20 +3,19 @@ import LightModeIcon from '@mui/icons-material/LightMode'
 import { ButtonGroup } from '@mui/material'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { $themeName, handleChangeThemeNameEv } from '@/layout/store.ts'
+import { ThemeStore } from '@/layout/store.ts'
 
-export default function DarkModePicker() {
-  const [themeName, setThemeName] = useUnit([
-    $themeName,
-    handleChangeThemeNameEv,
-  ])
-
+const DarkModePicker = observer(function DarkModePicker({
+  themeStore,
+}: {
+  themeStore: ThemeStore
+}) {
   const { t } = useTranslation()
 
   const colorAndOpacity = (inputTheme: 'dark' | 'light') => {
-    if (themeName === inputTheme) {
+    if (themeStore.themeName === inputTheme) {
       return {
         opacity: 1,
         color: 'primary',
@@ -33,7 +32,7 @@ export default function DarkModePicker() {
     <Box textAlign={'center'} mt={2}>
       <ButtonGroup>
         <Button
-          onClick={() => setThemeName('light')}
+          onClick={() => themeStore.handleChangeThemeName('light')}
           color={colorAndOpacity('light').color}
           sx={{
             opacity: colorAndOpacity('light').opacity,
@@ -43,7 +42,7 @@ export default function DarkModePicker() {
           {t('Light')}
         </Button>
         <Button
-          onClick={() => setThemeName('dark')}
+          onClick={() => themeStore.handleChangeThemeName('dark')}
           color={colorAndOpacity('dark').color}
           sx={{
             opacity: colorAndOpacity('dark').opacity,
@@ -55,4 +54,6 @@ export default function DarkModePicker() {
       </ButtonGroup>
     </Box>
   )
-}
+})
+
+export default DarkModePicker

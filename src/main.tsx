@@ -9,11 +9,12 @@ import UserDetails from '@/features/user-details/UserDetails.tsx'
 import Users from '@/features/users/Users'
 import './i18n/i18n'
 import Layout from '@/layout/Layout.tsx'
+import { themeStore } from '@/layout/store.ts'
 import ThemeWrapper from '@/layout/ThemeWrapper.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeWrapper>
+    <ThemeWrapper themeStore={themeStore}>
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>

@@ -1,16 +1,20 @@
 import { ReactElement } from 'react'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
-import { useUnit } from 'effector-react/compat'
-import { $primaryColor, $themeName } from '@/layout/store.ts'
+import { observer } from 'mobx-react-lite'
+import { ThemeStore } from '@/layout/store.ts'
 
-export default function ThemeWrapper({ children }: { children: ReactElement }) {
-  const [mode, primaryColor] = useUnit([$themeName, $primaryColor])
-
+const ThemeWrapper = observer(function ThemeWrapper({
+  themeStore,
+  children,
+}: {
+  themeStore: ThemeStore
+  children: ReactElement
+}) {
   const theme = createTheme({
     palette: {
-      mode,
+      mode: themeStore.themeName,
       primary: {
-        main: primaryColor,
+        main: themeStore.primaryColor,
       },
     },
   })
@@ -21,4 +25,6 @@ export default function ThemeWrapper({ children }: { children: ReactElement }) {
       {children}
     </ThemeProvider>
   )
-}
+})
+
+export default ThemeWrapper

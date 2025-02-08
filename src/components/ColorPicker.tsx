@@ -1,9 +1,9 @@
 import CheckIcon from '@mui/icons-material/Check'
 import { Box, Stack, Typography } from '@mui/material'
 import * as muiColors from '@mui/material/colors'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { $primaryColor, handleChangePrimaryColorEv } from '@/layout/store.ts'
+import { ThemeStore } from '@/layout/store.ts'
 import { omit } from '@/utils/helpers.ts'
 
 const colors = Object.entries(
@@ -24,16 +24,15 @@ const shadeToName = Object.entries(omit(muiColors, ['common'])).reduce(
   {} as Record<string, string>,
 )
 
-const ColorPicker = () => {
-  const [selectedColor, setSelectedColor] = useUnit([
-    $primaryColor,
-    handleChangePrimaryColorEv,
-  ])
-
+const ColorPicker = observer(function ColorPicker({
+  themeStore,
+}: {
+  themeStore: ThemeStore
+}) {
   const { t } = useTranslation()
 
   const handleClick = (color: string) => {
-    setSelectedColor(color)
+    themeStore.handleChangePrimaryColor(color)
   }
 
   return (
@@ -45,10 +44,10 @@ const ColorPicker = () => {
         <Typography
           lineHeight={1}
           fontWeight={'bold'}
-          sx={{ color: selectedColor }}
+          sx={{ color: themeStore.primaryColor }}
           variant="body2"
         >
-          {shadeToName[selectedColor]}
+          {shadeToName[themeStore.primaryColor]}
         </Typography>
       </Stack>
 
@@ -74,7 +73,7 @@ const ColorPicker = () => {
             }}
             onClick={() => handleClick(shade)}
           >
-            {colorName === shadeToName[selectedColor] && (
+            {colorName === shadeToName[themeStore.primaryColor] && (
               <CheckIcon sx={{ color: '#fff', fontSize: '2rem' }} />
             )}
           </Box>
@@ -82,6 +81,6 @@ const ColorPicker = () => {
       </Box>
     </Box>
   )
-}
+})
 
 export default ColorPicker

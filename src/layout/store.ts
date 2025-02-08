@@ -1,11 +1,21 @@
 import { indigo } from '@mui/material/colors'
-import { createEvent, createStore } from 'effector'
+import { action, observable } from 'mobx'
 
-export const $primaryColor = createStore<string>(indigo['500'])
-export const $themeName = createStore<'light' | 'dark'>('light')
+export class ThemeStore {
+  @observable accessor themeName: 'light' | 'dark' = 'light'
+  @observable accessor primaryColor: string = indigo['500']
 
-export const handleChangePrimaryColorEv = createEvent<string>()
-export const handleChangeThemeNameEv = createEvent<'light' | 'dark'>()
+  constructor() {}
 
-$primaryColor.on(handleChangePrimaryColorEv, (_, payload) => payload)
-$themeName.on(handleChangeThemeNameEv, (_, payload) => payload)
+  @action
+  handleChangeThemeName(name: 'light' | 'dark') {
+    this.themeName = name
+  }
+
+  @action
+  handleChangePrimaryColor(color: string) {
+    this.primaryColor = color
+  }
+}
+
+export const themeStore = new ThemeStore()

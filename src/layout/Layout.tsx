@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { Outlet } from 'react-router'
 import ColorPicker from '@/components/ColorPicker.tsx'
 import DarkModePicker from '@/components/DarkModePicker.tsx'
+import { themeStore } from '@/layout/store.ts'
 
 const drawerWidth = 240
 const navItems = [
@@ -179,9 +180,9 @@ const RightDrawer = () => {
           {t('Settings')}
         </Typography>
         <Divider />
-        <DarkModePicker />
+        <DarkModePicker themeStore={themeStore} />
 
-        <ColorPicker />
+        <ColorPicker themeStore={themeStore} />
       </Drawer>
     </>
   )

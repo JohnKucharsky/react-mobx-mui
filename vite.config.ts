@@ -19,7 +19,21 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), vercel()],
+    plugins: [
+      react({
+        babel: {
+          plugins: [
+            [
+              '@babel/plugin-proposal-decorators',
+              {
+                version: '2023-05',
+              },
+            ],
+          ],
+        },
+      }),
+      vercel(),
+    ],
     resolve: {
       alias: { '@': path.resolve(__dirname, 'src').replace(/\\/g, '/') },
     },
