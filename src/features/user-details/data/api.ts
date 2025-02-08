@@ -1,4 +1,4 @@
-import { createEffect, createStore } from 'effector'
+import { action, observable, runInAction } from 'mobx'
 import { z } from 'zod'
 import {
   CommentType,
@@ -10,71 +10,69 @@ import { type User, UserSchema } from '@/features/users/data/types.ts'
 import { axiosInstance } from '@/utils/axios'
 import { apiRoutes } from '@/utils/constants.ts'
 import { groupBy } from '@/utils/helpers.ts'
-import { logEffectError, logZodError } from '@/utils/loggers.ts'
+import { logZodError } from '@/utils/loggers.ts'
 
-export const $user = createStore<{
-  user: User
-  posts: Post[]
-} | null>(null)
-export const $comments = createStore<Record<string, CommentType[]> | null>(null)
+export class UserDetailsStore {
+  @observable accessor user: {
+    user: User
+    posts: Post[]
+  } | null = null
+  @observable accessor userLoading: boolean = false
 
-export const getCommentsFx = createEffect<
-  unknown,
-  Record<string, CommentType[]>
->(async () => {
-  const res = await axiosInstance.get<CommentType[]>(apiRoutes['/comments'])
+  @observable accessor comments: Record<string, CommentType[]> | null = null
+  @observable accessor commentLoading: boolean = false
 
-  try {
-    z.array(CommentSchema).parse(res.data)
-  } catch (e) {
-    logZodError(e, apiRoutes['/comments'])
+  @action
+  async fetchComments() {
+    try {
+      this.commentLoading = true
+      const res = await axiosInstance.get<CommentType[]>(apiRoutes['/comments'])
+      z.array(CommentSchema).parse(res.data)
+
+      runInAction(() => {
+        this.comments = groupBy(res.data, (comment) => comment.postId)
+      })
+    } catch (e) {
+      logZodError(e, apiRoutes['/comments'])
+    } finally {
+      this.commentLoading = false
+    }
   }
 
-  return groupBy(res.data, (comment) => comment.postId)
-})
+  @action
+  async fetchUser({ id }: { id?: string }) {
+    try {
+      this.userLoading = true
+      const resUser = await axiosInstance.get<User[]>(apiRoutes['/users'], {
+        params: {
+          id: id || undefined,
+        },
+      })
+      z.array(UserSchema).parse(resUser.data)
 
-logEffectError(apiRoutes['/comments'], getCommentsFx)
+      if (resUser.data.length === 0) {
+        return
+      }
 
-export const getUserFx = createEffect<
-  {
-    id?: string
-  },
-  { user: User; posts: Post[] } | null
->(async ({ id }) => {
-  const resUser = await axiosInstance.get<User[]>(apiRoutes['/users'], {
-    params: {
-      id: id || undefined,
-    },
-  })
+      const resPosts = await axiosInstance.get<Post[]>(apiRoutes['/posts'], {
+        params: {
+          userId: resUser.data[0].id,
+        },
+      })
+      z.array(PostSchema).parse(resPosts.data)
 
-  try {
-    z.array(UserSchema).parse(resUser.data)
-  } catch (e) {
-    logZodError(e, apiRoutes['/users'])
+      runInAction(() => {
+        this.user = {
+          user: resUser.data[0],
+          posts: resPosts.data,
+        }
+      })
+    } catch (e) {
+      logZodError(e, apiRoutes['/users'])
+    } finally {
+      this.userLoading = false
+    }
   }
-  if (resUser.data?.length === 0) {
-    return null
-  }
+}
 
-  const resPosts = await axiosInstance.get<Post[]>(apiRoutes['/posts'], {
-    params: {
-      userId: resUser.data[0].id,
-    },
-  })
-
-  try {
-    z.array(PostSchema).parse(resPosts.data)
-  } catch (e) {
-    logZodError(e, apiRoutes['/posts'])
-  }
-
-  return {
-    user: resUser.data[0],
-    posts: resPosts.data,
-  }
-})
-
-logEffectError(apiRoutes['/users'], getUserFx)
-
-$user.on(getUserFx.doneData, (_, payload) => payload)
-$comments.on(getCommentsFx.doneData, (_, payload) => payload)
+export const userDetailsStore = new UserDetailsStore()

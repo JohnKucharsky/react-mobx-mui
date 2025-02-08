@@ -1,6 +1,6 @@
 import { Card, Stack, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { GridSkeletons } from '@/components/GridSkeletons.tsx'
 import NoItems from '@/components/NoItems.tsx'
@@ -8,16 +8,13 @@ import RefreshButton from '@/components/RefreshButton.tsx'
 import FlexWrap from '@/components/StyledComponents/FlexWrap.tsx'
 import CardEl from '@/features/users/CardEl.tsx'
 import Create from '@/features/users/Create.tsx'
-import { $users, getUsersFx } from '@/features/users/data/api.ts'
-import { usersStarted } from '@/features/users/data/initializers.ts'
+import { UsersStore } from '@/features/users/data/store.ts'
 
-export default function GridView() {
-  const [users, loading, pageStarted] = useUnit([
-    $users,
-    getUsersFx.pending,
-    usersStarted,
-  ])
-
+const GridView = observer(function GridView({
+  usersStore,
+}: {
+  usersStore: UsersStore
+}) {
   const { t } = useTranslation()
 
   return (
@@ -40,7 +37,7 @@ export default function GridView() {
             <Typography variant={'h5'} fontWeight={'bold'}>
               {t('Users')}
             </Typography>
-            <RefreshButton onRefresh={pageStarted} loading={loading} />
+            <RefreshButton usersStore={usersStore} />
           </FlexWrap>
 
           <Create />
@@ -48,18 +45,22 @@ export default function GridView() {
       </Card>
 
       <NoItems
-        length={users?.length}
+        length={usersStore.users?.length}
         title={t('couldNotFindSearchedUsers')}
-        loading={loading}
+        loading={usersStore.usersLoading}
       />
 
-      {loading ? (
+      {usersStore.usersLoading ? (
         <GridSkeletons skeletonNum={4} />
       ) : (
         <Grid container spacing={1}>
-          {users?.map((item) => <CardEl key={item.id} user={item} />)}
+          {usersStore.users?.map((item) => (
+            <CardEl key={item.id} user={item} />
+          ))}
         </Grid>
       )}
     </>
   )
-}
+})
+
+export default GridView

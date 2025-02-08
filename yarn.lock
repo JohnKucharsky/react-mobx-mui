@@ -2165,18 +2165,6 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-effector-react@^23.3.0:
-  version "23.3.0"
-  resolved "https://registry.yarnpkg.com/effector-react/-/effector-react-23.3.0.tgz#9244c3f677adaea69e6815d68000d25bc466c1f3"
-  integrity sha512-QR0+x1EnbiWhO80Yc0GVF+I9xCYoxBm3t+QLB5Wg+1uY1Q1BrSWDmKvJaJJZ/+9BU4RAr25yS5J2EkdWnicu8g==
-  dependencies:
-    use-sync-external-store "^1.0.0"
-
-effector@^23.2.3:
-  version "23.2.3"
-  resolved "https://registry.yarnpkg.com/effector/-/effector-23.2.3.tgz#178ec8d8683c14fe26de56fa69a7e20af5282b72"
-  integrity sha512-nBk3pzdJKT/Sn3OhLUurZoxKXUBd+iqiYHNoBRDFc8EE/vXp2JPNsickX59ZjlDbsWZwTMCVV3tovxjRo+vMGQ==
-
 electron-to-chromium@^1.5.73:
   version "1.5.75"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.75.tgz#bba96eabf0e8ca36324679caa38b982800acc87d"
@@ -4700,7 +4688,7 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-use-sync-external-store@^1.0.0, use-sync-external-store@^1.4.0:
+use-sync-external-store@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.4.0.tgz#adbc795d8eeb47029963016cefdf89dc799fcebc"
   integrity sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==

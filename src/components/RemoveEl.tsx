@@ -1,24 +1,21 @@
-import { EventCallable, Store } from 'effector'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import DeleteSelectedItems from '@/components/DeleteSelectedItems'
+import { UsersStore } from '@/features/users/data/store.ts'
 
-export default function RemoveEl<T>({
-  $hasSelectedItems,
-  handleOpenConfirmDeleteEv,
+const RemoveEl = observer(function RemoveEl({
+  usersStore,
 }: {
-  $hasSelectedItems: Store<boolean>
-  handleOpenConfirmDeleteEv: EventCallable<T | null>
+  usersStore: UsersStore
 }) {
-  const [hasSelectedItems, handleOpenConfirmDelete] = useUnit([
-    $hasSelectedItems,
-    handleOpenConfirmDeleteEv,
-  ])
-
   return (
     <>
-      {hasSelectedItems && (
-        <DeleteSelectedItems onClick={() => handleOpenConfirmDelete(null)} />
+      {usersStore.hasSelectedItems && (
+        <DeleteSelectedItems
+          onClick={() => usersStore.openConfirmDelete(null)}
+        />
       )}
     </>
   )
-}
+})
+
+export default RemoveEl

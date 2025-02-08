@@ -1,38 +1,37 @@
 import { useEffect } from 'react'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import ConfirmDelete from '@/components/ConfirmDelete'
-import { deleteUserFx } from '@/features/users/data/api.ts'
-import { usersStarted } from '@/features/users/data/initializers.ts'
-import { usersStore } from '@/features/users/data/store.ts'
+import { UsersStore } from '@/features/users/data/store.ts'
 import GridView from '@/features/users/GridView.tsx'
 import TableView from '@/features/users/TableView.tsx'
 
-export default function Users() {
-  const [pageStarted] = useUnit([usersStarted])
-
+const Users = observer(function Users({
+  usersStore,
+}: {
+  usersStore: UsersStore
+}) {
   const { t } = useTranslation()
   const theme = useTheme()
   const isUpMd = useMediaQuery(theme.breakpoints.up('md'))
 
   useEffect(() => {
-    pageStarted()
-  }, [pageStarted])
+    usersStore.fetchUsers().catch(console.error)
+  }, [usersStore])
 
   return (
     <>
       <Box px={{ xs: 1, sm: 2 }} pt={1} pb={2}>
-        {isUpMd ? <TableView /> : <GridView />}
+        {isUpMd ? (
+          <TableView usersStore={usersStore} />
+        ) : (
+          <GridView usersStore={usersStore} />
+        )}
       </Box>
-      <ConfirmDelete
-        $confirmDeleteOpened={usersStore.$confirmDeleteOpened}
-        $idToDelete={usersStore.$idToDelete}
-        title={t('deleteWarningUsers')}
-        $selectedItems={usersStore.$selectedItems}
-        deleteItemFx={deleteUserFx}
-        handleCloseConfirmDeleteEv={usersStore.handleCloseConfirmDelete}
-      />
+      <ConfirmDelete title={t('deleteWarningUsers')} usersStore={usersStore} />
     </>
   )
-}
+})
+
+export default Users

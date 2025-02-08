@@ -1,105 +1,154 @@
-import { combine, createEvent, createStore, sample } from 'effector'
-import { $users, deleteUserFx } from '@/features/users/data/api.ts'
-import { Order, SortKeys } from '@/features/users/data/types.ts'
+import { action, computed, observable, runInAction } from 'mobx'
+import { z } from 'zod'
+import {
+  Order,
+  SortKeys,
+  type User,
+  PartialUser,
+  UserSchema,
+} from '@/features/users/data/types'
+import { axiosInstance } from '@/utils/axios'
+import { apiRoutes } from '@/utils/constants'
+import { logZodError } from '@/utils/loggers'
 
-// select
-const $selectedItems = createStore<Set<number>>(new Set())
-const handleSelectAllEv = createEvent<boolean>()
-const handleSelectOneEv = createEvent<number>()
+export class UsersStore {
+  @observable accessor users: User[] | null = null
+  @observable accessor usersLoading: boolean = false
+  @observable accessor selectedItems: Set<number> = new Set()
+  @observable accessor confirmDeleteOpened: boolean = false
+  @observable accessor idToDelete: number | null = null
+  @observable accessor order: Order = 'asc'
+  @observable accessor orderBy: SortKeys = 'name'
 
-const $hasSelectedItems = combine(
-  $selectedItems,
-  (selectedItems) => selectedItems.size > 0,
-)
+  @action
+  async fetchUsers(id?: string) {
+    this.usersLoading = true
+    try {
+      const res = await axiosInstance.get<User[]>(apiRoutes['/users'], {
+        params: { id: id || undefined },
+      })
 
-const $selectedSome = combine(
-  $selectedItems,
-  $users,
-  (selectedItems, items) => {
-    if (!items?.length) return false
-    return selectedItems.size > 0 && selectedItems.size < items.length
-  },
-)
-
-const $selectedAll = combine($selectedItems, $users, (selectedItems, items) => {
-  if (!items?.length) return false
-  return selectedItems.size === items.length
-})
-
-sample({
-  clock: handleSelectAllEv,
-  source: [$users],
-  fn: ([items], payload) => {
-    if (!items) return new Set<number>()
-    return payload
-      ? new Set<number>([...items.map((item) => item.id)])
-      : new Set<number>()
-  },
-  target: $selectedItems,
-})
-
-sample({
-  clock: deleteUserFx.done,
-  fn: (): Set<number> => new Set<number>(),
-  target: $selectedItems,
-})
-
-sample({
-  clock: handleSelectOneEv,
-  source: { selectedItems: $selectedItems },
-  fn: ({ selectedItems }, payload) => {
-    const copyState = new Set<number>(selectedItems)
-    if (!copyState.has(payload)) {
-      copyState.add(payload)
-    } else {
-      copyState.delete(payload)
+      runInAction(() => {
+        z.array(UserSchema).parse(res.data)
+        this.users = res.data
+      })
+    } catch (e) {
+      logZodError(e, apiRoutes['/users'])
+    } finally {
+      runInAction(() => {
+        this.usersLoading = false
+        this.clearSelectedItems()
+      })
     }
-    return copyState
-  },
-  target: $selectedItems,
-})
-// select
+  }
 
-// delete
-const $confirmDeleteOpened = createStore(false)
-const $idToDelete = createStore<number | null>(null)
+  @action
+  async addUser(data: PartialUser) {
+    const res = await axiosInstance.post<User>(apiRoutes['/users'], data)
+    runInAction(() => {
+      this.users = this.users ? [res.data, ...this.users] : [res.data]
+    })
+  }
 
-const handleCloseConfirmDelete = createEvent()
-const handleOpenConfirmDelete = createEvent<number | null>()
+  @action
+  async editUser(data: PartialUser, id: number) {
+    const res = await axiosInstance.put<User>(
+      `${apiRoutes['/users']}/${id}`,
+      data,
+    )
+    runInAction(() => {
+      if (this.users) {
+        this.users = this.users.map((item) =>
+          item.id === id ? res.data : item,
+        )
+      }
+    })
+  }
 
-$confirmDeleteOpened
-  .on(handleCloseConfirmDelete, () => false)
-  .on(handleOpenConfirmDelete, () => true)
-$idToDelete.on(handleOpenConfirmDelete, (_, value) => value)
-// delete
+  @action
+  async deleteUser(id: number) {
+    this.usersLoading = true
+    try {
+      await axiosInstance.delete(`${apiRoutes['/users']}/${id}`)
+      runInAction(() => {
+        if (this.users) {
+          this.users = this.users.filter((item) => item.id !== id)
+        }
+        if (this.selectedItems.size === 0) {
+          this.clearSelectedItems()
+        }
+      })
+    } catch (e) {
+      logZodError(e, apiRoutes['/users'])
+    } finally {
+      runInAction(() => {
+        this.usersLoading = false
+      })
+    }
+  }
 
-// order
-export const $order = createStore<Order>('asc')
-export const $orderBy = createStore<SortKeys>('name')
+  @action
+  selectAll(select: boolean) {
+    if (this.users) {
+      this.selectedItems = select
+        ? new Set(this.users.map((item) => item.id))
+        : new Set()
+    }
+  }
 
-export const handleRequestSortEv = createEvent<{
-  property: SortKeys
-  orderBy: SortKeys
-}>()
-$order.on(handleRequestSortEv, (state, payload) => {
-  const isAsc = payload.orderBy === payload.property && state === 'asc'
-  return isAsc ? 'desc' : 'asc'
-})
-$orderBy.on(handleRequestSortEv, (_, payload) => payload.property)
-// order
+  @action
+  toggleSelectOne(id: number) {
+    if (this.selectedItems.has(id)) {
+      this.selectedItems.delete(id)
+    } else {
+      this.selectedItems.add(id)
+    }
+  }
 
-export const usersStore = {
-  $selectedItems,
-  handleSelectAllEv,
-  handleSelectOneEv,
-  $hasSelectedItems,
-  $selectedSome,
-  $selectedAll,
-  handleCloseConfirmDelete,
-  handleOpenConfirmDelete,
-  $confirmDeleteOpened,
-  $idToDelete,
-  handleRequestSortEv,
-  $order,
-  $orderBy,
+  @action
+  clearSelectedItems() {
+    this.selectedItems.clear()
+  }
+
+  @computed
+  get hasSelectedItems() {
+    return this.selectedItems.size > 0
+  }
+
+  @computed
+  get selectedSome() {
+    return (
+      this.users &&
+      this.selectedItems.size > 0 &&
+      this.selectedItems.size < this.users.length
+    )
+  }
+
+  @computed
+  get selectedAll() {
+    return this.users && this.selectedItems.size === this.users.length
+  }
+
+  // Confirm delete
+  @action
+  openConfirmDelete(id: number | null) {
+    this.confirmDeleteOpened = true
+    this.idToDelete = id
+  }
+
+  @action
+  closeConfirmDelete() {
+    this.confirmDeleteOpened = false
+    this.idToDelete = null
+  }
+
+  // Sorting
+  @action
+  requestSort(property: SortKeys) {
+    const isAsc = this.orderBy === property && this.order === 'asc'
+    this.order = isAsc ? 'desc' : 'asc'
+    this.orderBy = property
+  }
 }
+
+export const usersStore = new UsersStore()

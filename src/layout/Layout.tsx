@@ -24,7 +24,7 @@ const drawerWidth = 240
 const navItems = [
   {
     title: 'GITHUB',
-    href: 'https://github.com/JohnKucharsky/react-effector-mui',
+    href: 'https://github.com/JohnKucharsky/react-mobx',
   },
   { title: 'TELEGRAM', href: 'https://t.me/johnkucharsky' },
   {

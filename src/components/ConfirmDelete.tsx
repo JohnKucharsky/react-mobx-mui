@@ -1,61 +1,38 @@
-import { Effect, EventCallable, Store } from 'effector'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import ConfirmDeleteUI from '@/components/ConfirmDeleteUI'
+import { UsersStore } from '@/features/users/data/store.ts'
 
-export default function ConfirmDelete<T>({
-  $confirmDeleteOpened,
-  $idToDelete,
-  handleCloseConfirmDeleteEv,
-  deleteItemFx,
-  $selectedItems,
+const ConfirmDelete = observer(function ConfirmDelete({
+  usersStore,
   title,
 }: {
-  $confirmDeleteOpened: Store<boolean>
-  $idToDelete: Store<T | null>
-  handleCloseConfirmDeleteEv: EventCallable<void>
-  deleteItemFx: Effect<T, any>
-  $selectedItems: Store<Set<T>>
+  usersStore: UsersStore
   title: string
 }) {
-  const [
-    confirmDeleteOpened,
-    id,
-    handleCloseConfirmDelete,
-    deleteItem,
-    loading,
-    selectedItems,
-  ] = useUnit([
-    $confirmDeleteOpened,
-    $idToDelete,
-    handleCloseConfirmDeleteEv,
-    deleteItemFx,
-    deleteItemFx.pending,
-    $selectedItems,
-  ])
-
   const handleDeleteCompleted = async () => {
     try {
-      if (id) {
-        await deleteItem(id)
+      if (usersStore.idToDelete) {
+        await usersStore.deleteUser(usersStore.idToDelete)
       } else {
-        for (const id of selectedItems) {
-          await deleteItem(id)
+        for (const id of usersStore.selectedItems) {
+          await usersStore.deleteUser(id)
         }
       }
     } catch (e) {
       console.error(e)
     } finally {
-      handleCloseConfirmDelete()
+      usersStore.closeConfirmDelete()
     }
   }
 
   return (
     <ConfirmDeleteUI
-      loading={loading}
-      openConfirmDelete={confirmDeleteOpened}
-      closeConfirmDelete={handleCloseConfirmDelete}
+      loading={usersStore.usersLoading}
+      openConfirmDelete={usersStore.confirmDeleteOpened}
+      closeConfirmDelete={() => usersStore.closeConfirmDelete()}
       handleDeleteCompleted={handleDeleteCompleted}
       deleteWarningText={title}
     />
   )
-}
+})
+export default ConfirmDelete

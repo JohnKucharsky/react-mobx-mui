@@ -1,11 +1,11 @@
 
-# React Effector MUI
+# React Mobx MUI
 
 This is a frontend project built for [JSONPlaceholder](https://jsonplaceholder.typicode.com/).
 
 ## Features
 
-- **Effector** for state management
+- **Mobx** for state management
 - **Type-safe** with Zod
 - **MUI** for UI components, including dark mode and a color picker
 - **React Router** for navigation
@@ -22,7 +22,7 @@ This is a frontend project built for [JSONPlaceholder](https://jsonplaceholder.t
 | [React](https://react.dev/)                   | 19.x        | UI library            |  
 | [Vite](https://vite.dev/)                     | 6.x         | Build tool            |  
 | [React Router](https://reactrouter.com/)      | 7.x         | Navigation library    |  
-| [Effector](https://effector.dev/)             | 23.x        | State manager         |  
+| [Mobx](https://mobx.js.org/)                  | 6.x         | State manager         |  
 | [MUI](https://mui.com/)                       | 6.x         | UI components         |  
 | [Zod](https://zod.dev/)                       | 3.x         | Schema validation     |  
 | [Formik](https://formik.org/)                 | 2.x         | Form state management |  
@@ -31,7 +31,7 @@ This is a frontend project built for [JSONPlaceholder](https://jsonplaceholder.t
 
 ## Getting Started
 
-A demo of the app is live at: [https://react-effector-mui.vercel.app/](https://react-effector-mui.vercel.app/).
+A demo of the app is live at: [https://react-mobx-mui.vercel.app/](https://react-mobx-mui.vercel.app/).
 
 ### Development
 

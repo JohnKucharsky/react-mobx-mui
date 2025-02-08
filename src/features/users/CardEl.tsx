@@ -10,7 +10,6 @@ import {
   useTheme,
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useUnit } from 'effector-react'
 import { useTranslation } from 'react-i18next'
 import CardControls from '@/components/Card/CardControls'
 import CardItem from '@/components/CardItem.tsx'
@@ -19,12 +18,8 @@ import { usersStore } from '@/features/users/data/store.ts'
 import { type User } from '@/features/users/data/types.ts'
 import Edit from '@/features/users/Edit'
 
-export default function CardEl({ user }: { user: User }) {
+const CardEl = function CardEl({ user }: { user: User }) {
   const [open, setOpen] = useState(false)
-
-  const [handleOpenConfirmDelete] = useUnit([
-    usersStore.handleOpenConfirmDelete,
-  ])
 
   const theme = useTheme()
   const isDownSm = useMediaQuery(theme.breakpoints.down('sm'))
@@ -59,7 +54,9 @@ export default function CardEl({ user }: { user: User }) {
 
             <CardControls
               handleEditOpen={() => setOpen(true)}
-              handleOpenConfirmDelete={() => handleOpenConfirmDelete(user.id)}
+              handleOpenConfirmDelete={() =>
+                usersStore.openConfirmDelete(user.id)
+              }
             />
           </Stack>
 
@@ -76,3 +73,5 @@ export default function CardEl({ user }: { user: User }) {
     </>
   )
 }
+
+export default CardEl

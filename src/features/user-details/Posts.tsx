@@ -13,25 +13,18 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import List from '@mui/material/List'
 import Typography from '@mui/material/Typography'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import TypographySkeleton from '@/components/TypographySkeleton.tsx'
 import Comment from '@/features/user-details/Comment.tsx'
-import {
-  $comments,
-  $user,
-  getUserFx,
-} from '@/features/user-details/data/api.ts'
+import { UserDetailsStore } from '@/features/user-details/data/api.ts'
 import { typographyPropsObj } from '@/features/user-details/data/service.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
-export default function Posts({ ...props }: BoxProps) {
-  const [user, comments, pending] = useUnit([
-    $user,
-    $comments,
-    getUserFx.pending,
-  ])
-
+const Posts = observer(function Posts({
+  userDetailsStore,
+  ...props
+}: { userDetailsStore: UserDetailsStore } & BoxProps) {
   const { t } = useTranslation()
   const theme = useTheme()
   const isDownMd = useMediaQuery(theme.breakpoints.down('md'))
@@ -52,8 +45,10 @@ export default function Posts({ ...props }: BoxProps) {
       >
         {t('Posts')}
       </TypographySkeleton>
-      {pending && !user && <AccordionSkeleton />}
-      {user?.posts.map((post) => (
+      {userDetailsStore.userLoading && !userDetailsStore.user && (
+        <AccordionSkeleton />
+      )}
+      {userDetailsStore.user?.posts.map((post) => (
         <Accordion elevation={3} key={post.id}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography
@@ -75,7 +70,7 @@ export default function Posts({ ...props }: BoxProps) {
               {t('Comments')}:
             </TypographySkeleton>
             <List sx={{ width: '100%', maxWidth: '60rem' }}>
-              {comments?.[post.id].map((comment, idx, arr) => (
+              {userDetailsStore.comments?.[post.id].map((comment, idx, arr) => (
                 <Comment
                   key={comment.id}
                   comment={comment}
@@ -88,7 +83,8 @@ export default function Posts({ ...props }: BoxProps) {
       ))}
     </Box>
   )
-}
+})
+export default Posts
 
 const AccordionSkeleton = () => {
   return Array(10)

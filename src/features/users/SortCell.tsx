@@ -1,38 +1,41 @@
 import { ReactElement } from 'react'
 import { Box, TableCell, TableCellProps, TableSortLabel } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
-import { useUnit } from 'effector-react'
-import { usersStore } from '@/features/users/data/store.ts'
+import { observer } from 'mobx-react-lite'
+import { UsersStore } from './data/store'
 import { SortKeys } from '@/features/users/data/types.ts'
 
-export default function SortCell({
+const SortCell = observer(function SortCell({
+  usersStore,
   property,
   children,
   ...props
 }: {
+  usersStore: UsersStore
   property: SortKeys
   children: ReactElement | string
 } & TableCellProps) {
-  const [orderBy, order, handleSort] = useUnit([
-    usersStore.$orderBy,
-    usersStore.$order,
-    usersStore.handleRequestSortEv,
-  ])
-
   return (
-    <TableCell {...props} sortDirection={orderBy === property ? order : false}>
+    <TableCell
+      {...props}
+      sortDirection={usersStore.orderBy === property ? usersStore.order : false}
+    >
       <TableSortLabel
-        active={orderBy === property}
-        direction={orderBy === property ? order : 'asc'}
-        onClick={() => handleSort({ property: property, orderBy })}
+        active={usersStore.orderBy === property}
+        direction={usersStore.orderBy === property ? usersStore.order : 'asc'}
+        onClick={() => usersStore.requestSort(property)}
       >
         {children}
-        {orderBy === property ? (
+        {usersStore.orderBy === property ? (
           <Box component="span" sx={visuallyHidden}>
-            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+            {usersStore.order === 'desc'
+              ? 'sorted descending'
+              : 'sorted ascending'}
           </Box>
         ) : null}
       </TableSortLabel>
     </TableCell>
   )
-}
+})
+
+export default SortCell

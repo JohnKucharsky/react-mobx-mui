@@ -10,15 +10,15 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import { useUnit } from 'effector-react'
 import { Formik } from 'formik'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { object } from 'yup'
 import DialogActionsEl from '@/components/DialogActionsEl'
 import CloseButton from '@/components/StyledComponents/CloseButton.tsx'
-import { addUserFx } from '@/features/users/data/api'
 import { userInputOutput } from '@/features/users/data/input-output'
 import { useYupSchemaUsers } from '@/features/users/data/service'
+import { usersStore } from '@/features/users/data/store.ts'
 import FormFields from '@/features/users/FormFields.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
@@ -53,9 +53,11 @@ export default function Create() {
   )
 }
 
-function CreateContent({ handleClose }: { handleClose: () => void }) {
-  const [addUser, loading] = useUnit([addUserFx, addUserFx.pending])
-
+const CreateContent = observer(function CreateContent({
+  handleClose,
+}: {
+  handleClose: () => void
+}) {
   const { t } = useTranslation()
   const schema = useYupSchemaUsers()
 
@@ -79,7 +81,7 @@ function CreateContent({ handleClose }: { handleClose: () => void }) {
           { resetForm, setErrors },
         ) => {
           try {
-            await addUser(userInputOutput.formatValues(restValues))
+            await usersStore.addUser(userInputOutput.formatValues(restValues))
 
             resetForm()
             handleClose()
@@ -120,7 +122,7 @@ function CreateContent({ handleClose }: { handleClose: () => void }) {
               </DialogContent>
               <DialogActionsEl
                 submit={errors.submit}
-                isSubmitting={loading}
+                isSubmitting={usersStore.usersLoading}
                 buttonTitle={t('Create')}
                 testKey={'create-button'}
               />
@@ -130,4 +132,4 @@ function CreateContent({ handleClose }: { handleClose: () => void }) {
       </Formik>
     </>
   )
-}
+})

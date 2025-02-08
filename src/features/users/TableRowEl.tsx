@@ -12,29 +12,29 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import { useStoreMap, useUnit } from 'effector-react'
+import { computed } from 'mobx'
+import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router'
 import { formatAddress } from '@/features/users/data/service.tsx'
-import { usersStore } from '@/features/users/data/store'
+import { UsersStore } from '@/features/users/data/store'
 import { type User } from '@/features/users/data/types'
 import Edit from '@/features/users/Edit'
 import { addTestKey } from '@/utils/test-keys.ts'
 
-export default function TableRowEl({ user }: { user: User }) {
+const TableRowEl = observer(function TableRowEl({
+  usersStore,
+  user,
+}: {
+  usersStore: UsersStore
+  user: User
+}) {
   const [open, setOpen] = useState(false)
-  const [handleSelectOne] = useUnit([usersStore.handleSelectOneEv])
 
   const theme = useTheme()
   const isDownSm = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate()
 
-  const isSelected = useStoreMap({
-    store: usersStore.$selectedItems,
-    keys: [user.id],
-    fn: (selectedItems, [id]) => {
-      return selectedItems.has(id)
-    },
-  })
+  const isSelected = computed(() => usersStore.selectedItems.has(user.id)).get()
 
   const handleEditOpen = () => setOpen(true)
   const handleEditClose = () => setOpen(false)
@@ -57,7 +57,7 @@ export default function TableRowEl({ user }: { user: User }) {
             size={'small'}
             checked={isSelected}
             onChange={() => {
-              handleSelectOne(user.id)
+              usersStore.toggleSelectOne(user.id)
             }}
             value={isSelected}
           />
@@ -99,4 +99,6 @@ export default function TableRowEl({ user }: { user: User }) {
       </TableRow>
     </>
   )
-}
+})
+
+export default TableRowEl

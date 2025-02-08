@@ -11,20 +11,22 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import TypographySkeleton from '@/components/TypographySkeleton.tsx'
-import { $user } from '@/features/user-details/data/api.ts'
+import { UserDetailsStore } from '@/features/user-details/data/api.ts'
 import {
   boxPropsObj,
   typographyPropsObj,
 } from '@/features/user-details/data/service.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
-export default function DetailsCard() {
-  const [user] = useUnit([$user])
-
+const DetailsCard = observer(function DetailsCard({
+  userDetailsStore,
+}: {
+  userDetailsStore: UserDetailsStore
+}) {
   const { t } = useTranslation()
   const theme = useTheme()
   const isDownMd = useMediaQuery(theme.breakpoints.down('md'))
@@ -57,7 +59,7 @@ export default function DetailsCard() {
           {...typographyProps.title}
           fontWeight={'bold'}
         >
-          {user?.user.name}
+          {userDetailsStore.user?.user.name}
         </TypographySkeleton>
         <IconButton
           onClick={() => {
@@ -90,7 +92,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.username}
+            {userDetailsStore.user?.user.username}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('Phone')}:
@@ -99,7 +101,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.phone}
+            {userDetailsStore.user?.user.phone}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('Email')}:
@@ -108,7 +110,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.email}
+            {userDetailsStore.user?.user.email}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('Website')}:
@@ -117,7 +119,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.website}
+            {userDetailsStore.user?.user.website}
           </TypographySkeleton>
         </Box>
         {/*main*/}
@@ -138,7 +140,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.address.city}
+            {userDetailsStore.user?.user.address.city}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('Street')}:
@@ -147,7 +149,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.address.street}
+            {userDetailsStore.user?.user.address.street}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('Suite')}:
@@ -156,7 +158,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.address.suite}
+            {userDetailsStore.user?.user.address.suite}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('ZipCode')}:
@@ -165,7 +167,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.address.zipcode}
+            {userDetailsStore.user?.user.address.zipcode}
           </TypographySkeleton>
         </Box>
         {/*address*/}
@@ -186,7 +188,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.company.name}
+            {userDetailsStore.user?.user.company.name}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('catchPhrase')}:
@@ -195,7 +197,7 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.company.catchPhrase}
+            {userDetailsStore.user?.user.company.catchPhrase}
           </TypographySkeleton>
           <Typography {...typographyProps.paragraphTitle}>
             {t('bs')}:
@@ -204,11 +206,13 @@ export default function DetailsCard() {
             {...typographyProps.paragraph}
             fontWeight={'bold'}
           >
-            {user?.user.company.bs}
+            {userDetailsStore.user?.user.company.bs}
           </TypographySkeleton>
         </Box>
         {/*company*/}
       </Paper>
     </>
   )
-}
+})
+
+export default DetailsCard

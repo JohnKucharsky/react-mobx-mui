@@ -1,33 +1,25 @@
 import { Checkbox, Tooltip } from '@mui/material'
-import { EventCallable, Store } from 'effector'
-import { useUnit } from 'effector-react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { UsersStore } from '@/features/users/data/store.ts'
 
-export default function TableCheckboxEl({
-  $selectedSome,
-  $selectedAll,
-  handleSelectAllEv,
+const TableCheckboxEl = observer(function TableCheckboxEl({
+  usersStore,
 }: {
-  $selectedSome: Store<boolean>
-  $selectedAll: Store<boolean>
-  handleSelectAllEv: EventCallable<boolean>
+  usersStore: UsersStore
 }) {
-  const [selectedSome, selectedAll, handleSelectAll] = useUnit([
-    $selectedSome,
-    $selectedAll,
-    handleSelectAllEv,
-  ])
-
   const { t } = useTranslation()
 
   return (
     <Tooltip arrow placement="top" title={t('selectAll')}>
       <Checkbox
         size={'small'}
-        checked={selectedAll}
-        indeterminate={selectedSome}
-        onChange={(e) => handleSelectAll(e.target.checked)}
+        checked={Boolean(usersStore.selectedAll)}
+        indeterminate={Boolean(usersStore.selectedSome)}
+        onChange={(e) => usersStore.selectAll(e.target.checked)}
       />
     </Tooltip>
   )
-}
+})
+
+export default TableCheckboxEl

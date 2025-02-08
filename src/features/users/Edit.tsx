@@ -1,26 +1,24 @@
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, DialogContent, DialogTitle } from '@mui/material'
-import { useUnit } from 'effector-react'
 import { Formik } from 'formik'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { object } from 'yup'
 import DialogActionsEl from '@/components/DialogActionsEl'
 import CloseButton from '@/components/StyledComponents/CloseButton.tsx'
-import { editUserFx } from '@/features/users/data/api'
 import { userInputOutput } from '@/features/users/data/input-output'
 import { useYupSchemaUsers } from '@/features/users/data/service'
+import { usersStore } from '@/features/users/data/store.ts'
 import { type User } from '@/features/users/data/types'
 import FormFields from '@/features/users/FormFields.tsx'
 
-export default function Edit({
+const Edit = observer(function Edit({
   handleEditClose,
   initialValues,
 }: {
   handleEditClose: () => void
   initialValues: User
 }) {
-  const [editUser, loading] = useUnit([editUserFx, editUserFx.pending])
-
   const { t } = useTranslation()
   const schema = useYupSchemaUsers()
 
@@ -49,10 +47,10 @@ export default function Edit({
           { resetForm, setErrors },
         ) => {
           try {
-            await editUser({
-              data: userInputOutput.formatValues(restValues),
-              id: initialValues.id,
-            })
+            await usersStore.editUser(
+              userInputOutput.formatValues(restValues),
+              initialValues.id,
+            )
 
             resetForm()
             handleCreateSuccess()
@@ -92,7 +90,7 @@ export default function Edit({
             </DialogContent>
             <DialogActionsEl
               submit={errors.submit}
-              isSubmitting={loading}
+              isSubmitting={usersStore.usersLoading}
               buttonTitle={t('Edit')}
               testKey={'edit-button'}
             />
@@ -101,4 +99,6 @@ export default function Edit({
       </Formik>
     </>
   )
-}
+})
+
+export default Edit
