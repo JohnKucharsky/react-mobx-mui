@@ -18,13 +18,12 @@ import { useTranslation } from 'react-i18next'
 import TypographySkeleton from '@/components/TypographySkeleton.tsx'
 import Comment from '@/features/user-details/Comment.tsx'
 import { typographyPropsObj } from '@/features/user-details/data/service.tsx'
-import { UserDetailsStore } from '@/features/user-details/data/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
-const Posts = observer(function Posts({
-  userDetailsStore,
-  ...props
-}: { userDetailsStore: UserDetailsStore } & BoxProps) {
+const Posts = observer(function Posts({ ...props }: BoxProps) {
+  const { userDetailsStore } = useRootStore()
+
   const { t } = useTranslation()
   const theme = useTheme()
   const isDownMd = useMediaQuery(theme.breakpoints.down('md'))

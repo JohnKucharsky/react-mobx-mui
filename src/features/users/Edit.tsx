@@ -8,9 +8,9 @@ import DialogActionsEl from '@/components/DialogActionsEl'
 import CloseButton from '@/components/StyledComponents/CloseButton.tsx'
 import { userInputOutput } from '@/features/users/data/input-output'
 import { useYupSchemaUsers } from '@/features/users/data/service'
-import { usersStore } from '@/features/users/data/store.ts'
 import { type User } from '@/features/users/data/types'
 import FormFields from '@/features/users/FormFields.tsx'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
 const Edit = observer(function Edit({
   handleEditClose,
@@ -19,6 +19,8 @@ const Edit = observer(function Edit({
   handleEditClose: () => void
   initialValues: User
 }) {
+  const { usersStore } = useRootStore()
+
   const { t } = useTranslation()
   const schema = useYupSchemaUsers()
 

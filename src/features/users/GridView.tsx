@@ -8,13 +8,11 @@ import RefreshButton from '@/components/RefreshButton.tsx'
 import FlexWrap from '@/components/StyledComponents/FlexWrap.tsx'
 import CardEl from '@/features/users/CardEl.tsx'
 import Create from '@/features/users/Create.tsx'
-import { UsersStore } from '@/features/users/data/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
-const GridView = observer(function GridView({
-  usersStore,
-}: {
-  usersStore: UsersStore
-}) {
+const GridView = observer(function GridView() {
+  const { usersStore } = useRootStore()
+
   const { t } = useTranslation()
 
   return (
@@ -37,7 +35,12 @@ const GridView = observer(function GridView({
             <Typography variant={'h5'} fontWeight={'bold'}>
               {t('Users')}
             </Typography>
-            <RefreshButton usersStore={usersStore} />
+            <RefreshButton
+              loading={usersStore.usersLoading}
+              onRefresh={() => {
+                usersStore.fetchUsers().catch(console.error)
+              }}
+            />
           </FlexWrap>
 
           <Create />

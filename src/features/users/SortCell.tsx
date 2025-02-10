@@ -2,33 +2,33 @@ import { ReactElement } from 'react'
 import { Box, TableCell, TableCellProps, TableSortLabel } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
 import { observer } from 'mobx-react-lite'
-import { UsersStore } from './data/store'
 import { SortKeys } from '@/features/users/data/types.ts'
+import { OrderStore } from '@/stores/OrderStore.ts'
 
 const SortCell = observer(function SortCell({
-  usersStore,
+  orderStore,
   property,
   children,
   ...props
 }: {
-  usersStore: UsersStore
+  orderStore: OrderStore
   property: SortKeys
   children: ReactElement | string
 } & TableCellProps) {
   return (
     <TableCell
       {...props}
-      sortDirection={usersStore.orderBy === property ? usersStore.order : false}
+      sortDirection={orderStore.orderBy === property ? orderStore.order : false}
     >
       <TableSortLabel
-        active={usersStore.orderBy === property}
-        direction={usersStore.orderBy === property ? usersStore.order : 'asc'}
-        onClick={() => usersStore.requestSort(property)}
+        active={orderStore.orderBy === property}
+        direction={orderStore.orderBy === property ? orderStore.order : 'asc'}
+        onClick={() => orderStore.requestSort(property)}
       >
         {children}
-        {usersStore.orderBy === property ? (
+        {orderStore.orderBy === property ? (
           <Box component="span" sx={visuallyHidden}>
-            {usersStore.order === 'desc'
+            {orderStore.order === 'desc'
               ? 'sorted descending'
               : 'sorted ascending'}
           </Box>

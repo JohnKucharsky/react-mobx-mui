@@ -76,5 +76,3 @@ export class UserDetailsStore {
     }
   }
 }
-
-export const userDetailsStore = new UserDetailsStore()

@@ -17,5 +17,3 @@ export class ThemeStore {
     this.primaryColor = color
   }
 }
-
-export const themeStore = new ThemeStore()

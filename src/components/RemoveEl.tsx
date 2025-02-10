@@ -1,17 +1,20 @@
 import { observer } from 'mobx-react-lite'
 import DeleteSelectedItems from '@/components/DeleteSelectedItems'
-import { UsersStore } from '@/features/users/data/store.ts'
+import { ConfirmDeleteStore } from '@/stores/ConfirmDeleteStore.ts'
+import { SelectionStore } from '@/stores/SelectionStore.ts'
 
 const RemoveEl = observer(function RemoveEl({
-  usersStore,
+  selectionStore,
+  confirmDeleteStore,
 }: {
-  usersStore: UsersStore
+  selectionStore: SelectionStore
+  confirmDeleteStore: ConfirmDeleteStore
 }) {
   return (
     <>
-      {usersStore.hasSelectedItems && (
+      {selectionStore.hasSelectedItems && (
         <DeleteSelectedItems
-          onClick={() => usersStore.openConfirmDelete(null)}
+          onClick={() => confirmDeleteStore.openConfirmDelete(null)}
         />
       )}
     </>

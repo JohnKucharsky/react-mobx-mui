@@ -5,13 +5,11 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { ThemeStore } from '@/layout/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
-const DarkModePicker = observer(function DarkModePicker({
-  themeStore,
-}: {
-  themeStore: ThemeStore
-}) {
+const DarkModePicker = observer(function DarkModePicker() {
+  const { themeStore } = useRootStore()
+
   const { t } = useTranslation()
 
   const colorAndOpacity = (inputTheme: 'dark' | 'light') => {

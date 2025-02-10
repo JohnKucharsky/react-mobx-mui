@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import * as muiColors from '@mui/material/colors'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { ThemeStore } from '@/layout/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 import { omit } from '@/utils/helpers.ts'
 
 const colors = Object.entries(
@@ -24,11 +24,9 @@ const shadeToName = Object.entries(omit(muiColors, ['common'])).reduce(
   {} as Record<string, string>,
 )
 
-const ColorPicker = observer(function ColorPicker({
-  themeStore,
-}: {
-  themeStore: ThemeStore
-}) {
+const ColorPicker = observer(function ColorPicker() {
+  const { themeStore } = useRootStore()
+
   const { t } = useTranslation()
 
   const handleClick = (color: string) => {

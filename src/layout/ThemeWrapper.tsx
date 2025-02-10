@@ -1,15 +1,15 @@
 import { ReactElement } from 'react'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { ThemeStore } from '@/layout/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
 const ThemeWrapper = observer(function ThemeWrapper({
-  themeStore,
   children,
 }: {
-  themeStore: ThemeStore
   children: ReactElement
 }) {
+  const { themeStore } = useRootStore()
+
   const theme = createTheme({
     palette: {
       mode: themeStore.themeName,

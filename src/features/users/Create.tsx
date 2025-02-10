@@ -18,8 +18,8 @@ import DialogActionsEl from '@/components/DialogActionsEl'
 import CloseButton from '@/components/StyledComponents/CloseButton.tsx'
 import { userInputOutput } from '@/features/users/data/input-output'
 import { useYupSchemaUsers } from '@/features/users/data/service'
-import { usersStore } from '@/features/users/data/store.ts'
 import FormFields from '@/features/users/FormFields.tsx'
+import { useRootStore } from '@/stores/RootStore.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
 export default function Create() {
@@ -58,6 +58,8 @@ const CreateContent = observer(function CreateContent({
 }: {
   handleClose: () => void
 }) {
+  const { usersStore } = useRootStore()
+
   const { t } = useTranslation()
   const schema = useYupSchemaUsers()
 

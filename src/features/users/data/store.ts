@@ -1,12 +1,9 @@
 import { action, computed, observable, runInAction } from 'mobx'
 import { z } from 'zod'
-import {
-  Order,
-  SortKeys,
-  type User,
-  PartialUser,
-  UserSchema,
-} from '@/features/users/data/types'
+import { type User, PartialUser, UserSchema } from '@/features/users/data/types'
+import { ConfirmDeleteStore } from '@/stores/ConfirmDeleteStore.ts'
+import { OrderStore } from '@/stores/OrderStore.ts'
+import { SelectionStore } from '@/stores/SelectionStore.ts'
 import { axiosInstance } from '@/utils/axios'
 import { apiRoutes } from '@/utils/constants'
 import { logZodError } from '@/utils/loggers'
@@ -14,11 +11,10 @@ import { logZodError } from '@/utils/loggers'
 export class UsersStore {
   @observable accessor users: User[] | null = null
   @observable accessor usersLoading: boolean = false
-  @observable accessor selectedItems: Set<number> = new Set()
-  @observable accessor confirmDeleteOpened: boolean = false
-  @observable accessor idToDelete: number | null = null
-  @observable accessor order: Order = 'asc'
-  @observable accessor orderBy: SortKeys = 'name'
+
+  public readonly selectionStore = new SelectionStore()
+  public readonly orderStore = new OrderStore()
+  public readonly confirmDeleteStore = new ConfirmDeleteStore()
 
   @action
   async fetchUsers(id?: string) {
@@ -37,7 +33,7 @@ export class UsersStore {
     } finally {
       runInAction(() => {
         this.usersLoading = false
-        this.clearSelectedItems()
+        this.selectionStore.clearSelectedItems()
       })
     }
   }
@@ -79,7 +75,7 @@ export class UsersStore {
       logZodError(e, apiRoutes['/users'])
     } finally {
       runInAction(() => {
-        this.clearSelectedItems()
+        this.selectionStore.clearSelectedItems()
         this.usersLoading = false
       })
     }
@@ -89,7 +85,7 @@ export class UsersStore {
   async deleteManyUsers() {
     this.usersLoading = true
     try {
-      for (const id of this.selectedItems) {
+      for (const id of this.selectionStore.selectedIds) {
         await axiosInstance.delete(`${apiRoutes['/users']}/${id}`)
         runInAction(() => {
           if (this.users) {
@@ -102,45 +98,17 @@ export class UsersStore {
     } finally {
       runInAction(() => {
         this.usersLoading = false
-        this.clearSelectedItems()
+        this.selectionStore.clearSelectedItems()
       })
     }
-  }
-
-  @action
-  selectAll(select: boolean) {
-    if (this.users) {
-      this.selectedItems = select
-        ? new Set(this.users.map((item) => item.id))
-        : new Set()
-    }
-  }
-
-  @action
-  toggleSelectOne(id: number) {
-    if (this.selectedItems.has(id)) {
-      this.selectedItems.delete(id)
-    } else {
-      this.selectedItems.add(id)
-    }
-  }
-
-  @action
-  clearSelectedItems() {
-    this.selectedItems.clear()
-  }
-
-  @computed
-  get hasSelectedItems() {
-    return this.selectedItems.size > 0
   }
 
   @computed
   get selectedSome() {
     return (
       this.users &&
-      this.selectedItems.size > 0 &&
-      this.selectedItems.size < this.users.length
+      this.selectionStore.selectedItems.size > 0 &&
+      this.selectionStore.selectedItems.size < this.users.length
     )
   }
 
@@ -149,30 +117,7 @@ export class UsersStore {
     return (
       this.users &&
       this.users.length &&
-      this.selectedItems.size === this.users.length
+      this.selectionStore.selectedItems.size === this.users.length
     )
   }
-
-  // Confirm delete
-  @action
-  openConfirmDelete(id: number | null) {
-    this.confirmDeleteOpened = true
-    this.idToDelete = id
-  }
-
-  @action
-  closeConfirmDelete() {
-    this.confirmDeleteOpened = false
-    this.idToDelete = null
-  }
-
-  // Sorting
-  @action
-  requestSort(property: SortKeys) {
-    const isAsc = this.orderBy === property && this.order === 'asc'
-    this.order = isAsc ? 'desc' : 'asc'
-    this.orderBy = property
-  }
 }
-
-export const usersStore = new UsersStore()

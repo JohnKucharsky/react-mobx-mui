@@ -19,14 +19,12 @@ import {
   boxPropsObj,
   typographyPropsObj,
 } from '@/features/user-details/data/service.tsx'
-import { UserDetailsStore } from '@/features/user-details/data/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 import { addTestKey } from '@/utils/test-keys.ts'
 
-const DetailsCard = observer(function DetailsCard({
-  userDetailsStore,
-}: {
-  userDetailsStore: UserDetailsStore
-}) {
+const DetailsCard = observer(function DetailsCard() {
+  const { userDetailsStore } = useRootStore()
+
   const { t } = useTranslation()
   const theme = useTheme()
   const isDownMd = useMediaQuery(theme.breakpoints.down('md'))

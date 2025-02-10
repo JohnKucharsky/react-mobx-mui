@@ -1,33 +1,35 @@
 import { observer } from 'mobx-react-lite'
 import ConfirmDeleteUI from '@/components/ConfirmDeleteUI'
-import { UsersStore } from '@/features/users/data/store.ts'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
 const ConfirmDelete = observer(function ConfirmDelete({
-  usersStore,
   title,
 }: {
-  usersStore: UsersStore
   title: string
 }) {
+  const { usersStore } = useRootStore()
+
   const handleDeleteCompleted = async () => {
     try {
-      if (usersStore.idToDelete) {
-        await usersStore.deleteUser(usersStore.idToDelete)
+      if (usersStore.confirmDeleteStore.idToDelete) {
+        await usersStore.deleteUser(usersStore.confirmDeleteStore.idToDelete)
       } else {
         await usersStore.deleteManyUsers()
       }
     } catch (e) {
       console.error(e)
     } finally {
-      usersStore.closeConfirmDelete()
+      usersStore.confirmDeleteStore.closeConfirmDelete()
     }
   }
 
   return (
     <ConfirmDeleteUI
       loading={usersStore.usersLoading}
-      openConfirmDelete={usersStore.confirmDeleteOpened}
-      closeConfirmDelete={() => usersStore.closeConfirmDelete()}
+      openConfirmDelete={usersStore.confirmDeleteStore.confirmDeleteOpened}
+      closeConfirmDelete={() =>
+        usersStore.confirmDeleteStore.closeConfirmDelete()
+      }
       handleDeleteCompleted={handleDeleteCompleted}
       deleteWarningText={title}
     />

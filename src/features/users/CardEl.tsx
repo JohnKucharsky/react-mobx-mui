@@ -14,11 +14,13 @@ import { useTranslation } from 'react-i18next'
 import CardControls from '@/components/Card/CardControls'
 import CardItem from '@/components/CardItem.tsx'
 import { formatAddress } from '@/features/users/data/service.tsx'
-import { usersStore } from '@/features/users/data/store.ts'
 import { type User } from '@/features/users/data/types.ts'
 import Edit from '@/features/users/Edit'
+import { useRootStore } from '@/stores/RootStore.tsx'
 
 const CardEl = function CardEl({ user }: { user: User }) {
+  const { usersStore } = useRootStore()
+
   const [open, setOpen] = useState(false)
 
   const theme = useTheme()
@@ -55,7 +57,7 @@ const CardEl = function CardEl({ user }: { user: User }) {
             <CardControls
               handleEditOpen={() => setOpen(true)}
               handleOpenConfirmDelete={() =>
-                usersStore.openConfirmDelete(user.id)
+                usersStore.confirmDeleteStore.openConfirmDelete(user.id)
               }
             />
           </Stack>

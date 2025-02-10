@@ -16,16 +16,16 @@ import { computed } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router'
 import { formatAddress } from '@/features/users/data/service.tsx'
-import { UsersStore } from '@/features/users/data/store'
 import { type User } from '@/features/users/data/types'
 import Edit from '@/features/users/Edit'
+import { SelectionStore } from '@/stores/SelectionStore.ts'
 import { addTestKey } from '@/utils/test-keys.ts'
 
 const TableRowEl = observer(function TableRowEl({
-  usersStore,
+  selectionStore,
   user,
 }: {
-  usersStore: UsersStore
+  selectionStore: SelectionStore
   user: User
 }) {
   const [open, setOpen] = useState(false)
@@ -34,7 +34,9 @@ const TableRowEl = observer(function TableRowEl({
   const isDownSm = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate()
 
-  const isSelected = computed(() => usersStore.selectedItems.has(user.id)).get()
+  const isSelected = computed(() =>
+    selectionStore.selectedItems.has(user.id),
+  ).get()
 
   const handleEditOpen = () => setOpen(true)
   const handleEditClose = () => setOpen(false)
@@ -57,7 +59,7 @@ const TableRowEl = observer(function TableRowEl({
             size={'small'}
             checked={isSelected}
             onChange={() => {
-              usersStore.toggleSelectOne(user.id)
+              selectionStore.toggleSelectOne(user.id)
             }}
             value={isSelected}
           />

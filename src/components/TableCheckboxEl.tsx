@@ -16,7 +16,12 @@ const TableCheckboxEl = observer(function TableCheckboxEl({
         size={'small'}
         checked={Boolean(usersStore.selectedAll)}
         indeterminate={Boolean(usersStore.selectedSome)}
-        onChange={(e) => usersStore.selectAll(e.target.checked)}
+        onChange={(e) =>
+          usersStore.selectionStore.selectAll(
+            usersStore.users?.map((item) => item.id) || [],
+            e.target.checked,
+          )
+        }
       />
     </Tooltip>
   )
