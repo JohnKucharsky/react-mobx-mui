@@ -26,6 +26,7 @@ import { orderByFunc } from '@/utils/helpers.ts'
 
 const TableView = observer(function TableView() {
   const { usersStore } = useRootStore()
+  const { selectionStore, confirmDeleteStore, orderStore } = usersStore
 
   const { t } = useTranslation()
 
@@ -53,8 +54,8 @@ const TableView = observer(function TableView() {
 
         <Stack direction={'row'} alignItems={'center'} gap={1}>
           <RemoveEl
-            confirmDeleteStore={usersStore.confirmDeleteStore}
-            selectionStore={usersStore.selectionStore}
+            confirmDeleteStore={confirmDeleteStore}
+            selectionStore={selectionStore}
           />
           <Create />
         </Stack>
@@ -66,24 +67,30 @@ const TableView = observer(function TableView() {
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">
-                <TableCheckboxEl usersStore={usersStore} />
+                <TableCheckboxEl
+                  getChecked={() => Boolean(usersStore.selectedAll)}
+                  getIntermediate={() => Boolean(usersStore.selectedSome)}
+                  getOnChange={(checked: boolean) =>
+                    selectionStore.selectAll(
+                      usersStore.users?.map((item) => item.id) || [],
+                      checked,
+                    )
+                  }
+                />
               </TableCell>
-              <SortCell orderStore={usersStore.orderStore} property={'name'}>
+              <SortCell orderStore={orderStore} property={'name'}>
                 {t('Name')}
               </SortCell>
-              <SortCell
-                orderStore={usersStore.orderStore}
-                property={'username'}
-              >
+              <SortCell orderStore={orderStore} property={'username'}>
                 {t('userName')}
               </SortCell>
-              <SortCell orderStore={usersStore.orderStore} property={'email'}>
+              <SortCell orderStore={orderStore} property={'email'}>
                 {t('Email')}
               </SortCell>
-              <SortCell orderStore={usersStore.orderStore} property={'phone'}>
+              <SortCell orderStore={orderStore} property={'phone'}>
                 {t('Phone')}
               </SortCell>
-              <SortCell orderStore={usersStore.orderStore} property={'website'}>
+              <SortCell orderStore={orderStore} property={'website'}>
                 {t('Website')}
               </SortCell>
               <TableCell>{t('Address')}</TableCell>
@@ -108,8 +115,8 @@ const TableView = observer(function TableView() {
             <TableBody>
               {usersStore.users &&
                 orderByFunc(
-                  usersStore.orderStore.orderBy,
-                  usersStore.orderStore.order,
+                  orderStore.orderBy,
+                  orderStore.order,
                   usersStore.users,
                 )?.map((item) => (
                   <TableRowEl

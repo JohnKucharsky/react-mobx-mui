@@ -5,8 +5,6 @@ export class ThemeStore {
   @observable accessor themeName: 'light' | 'dark' = 'light'
   @observable accessor primaryColor: string = indigo['500']
 
-  constructor() {}
-
   @action
   handleChangeThemeName(name: 'light' | 'dark') {
     this.themeName = name

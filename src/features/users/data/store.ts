@@ -11,10 +11,15 @@ import { logZodError } from '@/utils/loggers'
 export class UsersStore {
   @observable accessor users: User[] | null = null
   @observable accessor usersLoading: boolean = false
+  selectionStore: SelectionStore
+  orderStore: OrderStore
+  confirmDeleteStore: ConfirmDeleteStore
 
-  public readonly selectionStore = new SelectionStore()
-  public readonly orderStore = new OrderStore()
-  public readonly confirmDeleteStore = new ConfirmDeleteStore()
+  constructor() {
+    this.selectionStore = new SelectionStore()
+    this.orderStore = new OrderStore()
+    this.confirmDeleteStore = new ConfirmDeleteStore()
+  }
 
   @action
   async fetchUsers(id?: string) {
